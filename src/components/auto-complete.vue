@@ -3,6 +3,7 @@
         <div class="auto-complete"
              v-bind:class="{'open-drop-down': isListActive}"
              v-handle-click-outside="handelOnOutSideClick"
+             v-on:click="_updateInput"
         >
             <div class="auto-complete-input">
                 <label v-for="tag in tags"
@@ -10,13 +11,15 @@
                        v-on:click="handelUnSelectItem(tag)"
                        v-bind:class="{'danger': !tag.formatted}"
                 >
-                    {{tag.email}}
+                    {{tag[keyMatch]}}
                 </label>
-                <input type="text"
-                       v-model="value"
-                       placeholder="Enter email"
+                <input autofocus="true"
+                       type="text"
                        ref="inputRef"
-                       autofocus
+
+                       :placeholder="'Enter ' +[[ keyMatch ]]"
+
+                       v-model="value"
 
                        v-on:keydown.38="handelOnArrowUp"
                        v-on:keydown.40="handelOnArrowDown"
@@ -32,7 +35,7 @@
                         v-on:click="handelSelectItem(item)"
                         v-bind:class="{'selected':item.isSelected, 'active':item.isActive}"
                     >
-                        <p>{{ item['email'] }}</p>
+                        <p>{{ item[keyMatch] }}</p>
                     </li>
                 </ul>
             </div>
@@ -45,12 +48,14 @@
 
     export default {
         name: "AutoComplete",
+        props: ['uri', 'keyMatch'],
+
         data() {
             return {
                 tags: [],
                 items: [],
                 value: "",
-                inputHasFocus: false
+                inputHasFocus: false,
             }
         },
         computed: {
@@ -62,9 +67,6 @@
             },
             getValue() {
                 return this.value.trim()
-            },
-            addNewTagItem(item) {
-                return this.tags.push(item);
             }
         },
         methods: {
@@ -81,7 +83,11 @@
                     return this.handelSelectItem(this.items[this._getActiveItemIndex()]);
                 }
 
-                this.setTagItem({email: this.getValue, formatted: false});
+                let object = new Object({
+                    formatted: false
+                });
+                object[this.keyMatch] = this.getValue;
+                this.setTagItem(object);
                 this.value = '';
             },
 
@@ -102,15 +108,17 @@
              * @param unSelectedItem
              */
             handelUnSelectItem(unSelectedItem) {
-                const {email} = unSelectedItem;
+                const keyMatch = this.keyMatch;
+                const keyMatchValue = unSelectedItem[keyMatch];
+
                 this.items = this.items.map(function (item) {
-                    if (item.email === email) {
+                    if (item[keyMatch] === keyMatchValue) {
                         item.isSelected = false;
                     }
                     return item;
                 });
 
-                this.tags = this.tags.filter(tag => tag.email !== email);
+                this.tags = this.tags.filter(tag => tag[keyMatch] !== keyMatchValue);
                 this._updateInput();
             },
 
@@ -119,9 +127,11 @@
              * @param selectedItem
              */
             handelSelectItem(selectedItem) {
-                const {email} = selectedItem;
+                const keyMatch = this.keyMatch;
+                const keyMatchValue = selectedItem[keyMatch];
+
                 this.items = this.items.map(function (item) {
-                    if (item.email === email) {
+                    if (item[keyMatch] === keyMatchValue) {
                         item.isSelected = true;
                     }
                     return item;
@@ -138,11 +148,12 @@
 
                 if (!this.validateValue)
                     return this.items = [];
+
                 //https://www.mocky.io/
-                axios.get('http://www.mocky.io/v2/5eb6ff46310000fe3bc8a0e3')
+                axios.get(this.uri)
                     .then(({data}) => {
                         this.items = data.filter(result => {
-                            return result['email'].search(this.getValue) >= 0;
+                            return result[this.keyMatch].search(this.getValue) >= 0;
                         });
                     })
                     .catch(error => {
@@ -192,7 +203,7 @@
              * @param tag
              */
             setTagItem(tag) {
-                this.addNewTagItem(tag);
+                this.tags.push(tag);
                 this._updateInput();
             },
 
