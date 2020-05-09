@@ -1,33 +1,310 @@
 <template>
-    <b-navbar type="dark" variant="dark">
-        <div class="container">
-            <b-navbar-nav>
-                <b-nav-item href="/" v-if="isLoggedIn">Home</b-nav-item>
-                <b-nav-item href="/about" v-if="isLoggedIn">About</b-nav-item>
-                <b-nav-item href="/contact_us" v-if="isLoggedIn">Contact Us</b-nav-item>
-                <b-nav-item href="/login" v-if="!isLoggedIn" right>Login</b-nav-item>
-                <b-nav-item href="#" v-if="isLoggedIn" right v-on:click="this.onLogOut">LogOut</b-nav-item>
-            </b-navbar-nav>
+    <div class="form-group">
+        <div class="auto-complete"
+             v-bind:class="{'open-drop-down': isListActive}"
+             v-handle-click-outside="handelOnOutSideClick"
+        >
+            <div class="auto-complete-input">
+                <label v-for="tag in tags"
+                       class="tag"
+                       v-on:click="handelUnSelectItem(tag)"
+                       v-bind:class="{'danger': !tag.formatted}"
+                >
+                    {{tag.email}}
+                </label>
+                <input type="text"
+                       v-model="value"
+                       placeholder="Enter email"
+                       ref="inputRef"
+                       autofocus
+
+                       v-on:keydown.38="handelOnArrowUp"
+                       v-on:keydown.40="handelOnArrowDown"
+
+                       v-on:input="handelSearch"
+                       v-on:keydown.13="handelOnInputEnter"
+                       v-on:keydown.8="handelOnBackSpace"
+                />
+            </div>
+            <div class="auto-complete-dropdown">
+                <ul ref="scrollContainer" id="auto_complete_list">
+                    <li v-for="item in items"
+                        v-on:click="handelSelectItem(item)"
+                        v-bind:class="{'selected':item.isSelected, 'active':item.isActive}"
+                    >
+                        <p>{{ item['email'] }}</p>
+                    </li>
+                </ul>
+            </div>
         </div>
-    </b-navbar>
+    </div>
 </template>
 
 <script>
-    export default {
-        name: "NavBar",
-        data() {
-            const isLoggedIn = !!window.localStorage?.user;
+    import axios from '../providers/request';
 
+    export default {
+        name: "AutoComplete",
+        data() {
             return {
-                isLoggedIn
+                tags: [],
+                items: [],
+                value: "",
+                inputHasFocus: false
+            }
+        },
+        computed: {
+            isListActive() {
+                return this.items.length !== 0;
+            },
+            validateValue() {
+                return this.value.trim().length !== 0;
+            },
+            getValue() {
+                return this.value.trim()
+            },
+            addNewTagItem(item) {
+                return this.tags.push(item);
             }
         },
         methods: {
-            onLogOut(e){
-                e.preventDefault();
-                window.localStorage.removeItem('user');
-                window.location.href = '/login'
-            }
+
+            /**
+             * handel input on user click enter
+             * @returns {*|void}
+             */
+            handelOnInputEnter() {
+                if (!this.validateValue)
+                    return;
+
+                if (this._getActiveItemIndex() > -1) {
+                    return this.handelSelectItem(this.items[this._getActiveItemIndex()]);
+                }
+
+                this.setTagItem({email: this.getValue, formatted: false});
+                this.value = '';
+            },
+
+            /**
+             * handel input on user click backspace to remove
+             * @returns {*|void}
+             */
+            handelOnBackSpace() {
+                if (this.validateValue)
+                    return;
+
+                this.tags.pop();
+                this._updateInput();
+            },
+
+            /**
+             * handel un select item
+             * @param unSelectedItem
+             */
+            handelUnSelectItem(unSelectedItem) {
+                const {email} = unSelectedItem;
+                this.items = this.items.map(function (item) {
+                    if (item.email === email) {
+                        item.isSelected = false;
+                    }
+                    return item;
+                });
+
+                this.tags = this.tags.filter(tag => tag.email !== email);
+                this._updateInput();
+            },
+
+            /**
+             * handel select new item
+             * @param selectedItem
+             */
+            handelSelectItem(selectedItem) {
+                const {email} = selectedItem;
+                this.items = this.items.map(function (item) {
+                    if (item.email === email) {
+                        item.isSelected = true;
+                    }
+                    return item;
+                });
+
+                this.setTagItem({...selectedItem, formatted: true});
+            },
+
+            /**
+             * handel search on user input value
+             * @returns {Array} of items
+             */
+            handelSearch() {
+
+                if (!this.validateValue)
+                    return this.items = [];
+                //https://www.mocky.io/
+                axios.get('http://www.mocky.io/v2/5eb6ff46310000fe3bc8a0e3')
+                    .then(({data}) => {
+                        this.items = data.filter(result => {
+                            return result['email'].search(this.getValue) >= 0;
+                        });
+                    })
+                    .catch(error => {
+                        console.log('Error', error);
+                    });
+            },
+
+            /**
+             * handel the event on user click out to close the drop down list
+             * @param event
+             */
+            handelOnOutSideClick(event) {
+                this.items = [];
+            },
+
+            /**
+             * handel event on user click arrow up to moving active item in list to up
+             * @param event
+             */
+            handelOnArrowUp(event) {
+                event.preventDefault();
+
+                let itemIndex = this._getActiveItemIndex();
+                let nextItemIndex = itemIndex < 0 ? 0 : itemIndex - 1; // next item up
+
+                this._updateList(itemIndex, nextItemIndex);
+            },
+
+            /**
+             * handel event on user click arrow down to moving active item in list to down
+             * @param event
+             */
+            handelOnArrowDown(event) {
+                event.preventDefault();
+
+                if (!this.items.length)
+                    return;
+
+                let itemIndex = this._getActiveItemIndex();
+                let nextItemIndex = itemIndex > this.items.length ? 0 : itemIndex + 1; // next item down
+
+                this._updateList(itemIndex, nextItemIndex);
+            },
+
+            /**
+             * handel set new item in tags list
+             * @param tag
+             */
+            setTagItem(tag) {
+                this.addNewTagItem(tag);
+                this._updateInput();
+            },
+
+            /**
+             * handel updating list items active or not active by item index in array
+             * @param itemIndex
+             * @param nextItemIndex
+             * @returns {*|void}
+             * @private
+             */
+            _updateList(itemIndex, nextItemIndex) {
+                let currentItem = this.items[itemIndex];
+                let nextItem = this.items[nextItemIndex];
+
+                if (nextItemIndex === 0) {
+                    return this._updateItem(nextItem, {...nextItem, isActive: true});
+                }
+
+                this._updateItem(currentItem, {...currentItem, isActive: false});
+                this._updateItem(nextItem, {...nextItem, isActive: true});
+                this._updateItemScrolling();
+            },
+
+            /**
+             * remove active item from the list
+             * @private
+             */
+            _removeActiveItem() {
+                let activeItem = this.items.find((item, index) => {
+                    if (item.isActive === true) {
+                        return {
+                            ...item,
+                            index
+                        }
+                    }
+                });
+
+                if (activeItem)
+                    this.items.splice(activeItem.index, 1, {...activeItem, isActive: false});
+            },
+
+            /**
+             * update the item object values
+             * @param targetItem
+             * @param updatedItem
+             * @private
+             */
+            _updateItem(targetItem, updatedItem) {
+                this.items.splice(this._getItemIndex(targetItem), 1, updatedItem)
+            },
+
+            /**
+             * function to get the active item in the list
+             * @returns {number}
+             * @private
+             */
+            _getActiveItemIndex() {
+                return this.items.findIndex(item => item.isActive);
+            },
+
+            /**
+             * function to get the item index by object
+             * @param item
+             * @returns {number}
+             * @private
+             */
+            _getItemIndex(item) {
+                let index = this.items.indexOf(item);
+                return index < 0 ? 0 : index;
+            },
+
+            /**
+             * function to update the input focus or un focus
+             * @param isFocus
+             * @returns {*}
+             * @private
+             */
+            _updateInput(isFocus = true) {
+                if (isFocus)
+                    return this.$refs.inputRef.focus();
+
+                return this.$refs.inputRef.blur();
+            },
+
+            /**
+             * function to update the scrolling on the dropdown list when user moving the arrow down or up
+             * @private
+             */
+            _updateItemScrolling() {
+                let activeItem = document.querySelector('#auto_complete_list').querySelector('li.active');
+                if (activeItem)
+                    activeItem.scrollIntoView({behavior: "auto", block: "center", inline: "nearest"});
+            },
+        },
+        directives: {
+            'handle-click-outside': {
+                bind: function (el, binding) {
+                    const {bubble} = binding.modifiers;
+                    const clickHandler = (e) => {
+                        if (bubble || (!el.contains(e.target) && el !== e.target)) {
+                            binding.value(e)
+                        }
+                    };
+                    el.__vueHandleClickOutside__ = clickHandler;
+                    document.addEventListener('click', clickHandler)
+                },
+
+                unbind: function (el) {
+                    document.removeEventListener('click', el.__vueHandleClickOutside__);
+                    el.__vueHandleClickOutside__ = null;
+                }
+            },
         }
     }
 </script>
