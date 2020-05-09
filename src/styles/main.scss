@@ -1,0 +1,11 @@
+// libraries
+@import '~bootstrap/scss/bootstrap';
+
+// style variables
+@import "variables";
+
+// override app style
+@import "style";
+
+// override mobile rules
+@import "mobile";
