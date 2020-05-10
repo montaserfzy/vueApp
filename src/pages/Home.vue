@@ -2,8 +2,10 @@
   <div>
     <h3>Home Page</h3>
     <AutoComplete
-            uri='http://www.mocky.io/v2/5eb6ff46310000fe3bc8a0e3?mocky-delay=10000ms'
+            uri='http://www.mocky.io/v2/5eb6ff46310000fe3bc8a0e3'
             keyMatch="email"
+            v-bind:maxInputTags=2
+            v-bind:requestDelay=1000
     />
   </div>
 </template>

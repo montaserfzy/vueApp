@@ -13,6 +13,11 @@
                 >
                     {{tag[keyMatch]}}
                 </label>
+                <label class="more"
+                       v-if="isMore">
+                    more {{getTotalMoreItems}}
+                </label>
+
                 <input autofocus="true"
                        type="text"
                        ref="inputRef"
@@ -20,6 +25,7 @@
                        :placeholder="'Enter ' +[[ keyMatch ]]"
 
                        v-model="value"
+                       v-on:click="handelOnInputClicked"
 
                        v-on:keydown.38="handelOnArrowUp"
                        v-on:keydown.40="handelOnArrowDown"
@@ -30,8 +36,16 @@
                 />
             </div>
             <div class="auto-complete-dropdown">
-                <ul ref="scrollContainer" id="auto_complete_list">
+                <PulseLoader
+                        color="#e1567c"
+                        :loading="isLoading"
+                        v-bind:style="spinnerStyle"></PulseLoader>
+                <ul ref="scrollContainer"
+                    id="auto_complete_list"
+                    v-bind:class="{'active': !isLoading}"
+                >
                     <li v-for="item in items"
+                        :key="item[keyMatch]"
                         v-on:click="handelSelectItem(item)"
                         v-bind:class="{'selected':item.isSelected, 'active':item.isActive}"
                     >
@@ -45,10 +59,30 @@
 
 <script>
     import axios from '../providers/request';
+    import PulseLoader from 'vue-spinner/src/PulseLoader.vue'
+
 
     export default {
         name: "AutoComplete",
-        props: ['uri', 'keyMatch'],
+
+        props: {
+            uri: {
+                type: String,
+                required: true
+            },
+            keyMatch: {
+                type: String,
+                required: true
+            },
+            maxInputTags: {
+                type: Number,
+                default: 5
+            },
+            requestDelay: {
+                type: Number,
+                default: 100
+            }
+        },
 
         data() {
             return {
@@ -56,17 +90,37 @@
                 items: [],
                 value: "",
                 inputHasFocus: false,
+                loading: false,
+                tempTags: [],
+                requestTimeout: null,
+                spinnerStyle: {
+                    height: 20,
+                    width: 40,
+                    margin: '30px auto',
+                }
             }
+        },
+        components: {
+            'PulseLoader': PulseLoader
         },
         computed: {
             isListActive() {
-                return this.items.length !== 0;
+                return this.items.length !== 0 || this.isLoading;
             },
             validateValue() {
                 return this.value.trim().length !== 0;
             },
             getValue() {
                 return this.value.trim()
+            },
+            getTotalMoreItems() {
+                return this.tempTags.length
+            },
+            isMore() {
+                return this.tempTags.length !== 0;
+            },
+            isLoading() {
+                return this.loading || false
             }
         },
         methods: {
@@ -131,13 +185,12 @@
                 const keyMatchValue = selectedItem[keyMatch];
 
                 this.items = this.items.map(function (item) {
-                    if (item[keyMatch] === keyMatchValue) {
+                    if (item[keyMatch] === keyMatchValue && !item.isSelected) {
                         item.isSelected = true;
+                        this.setTagItem({...selectedItem, formatted: true});
                     }
                     return item;
-                });
-
-                this.setTagItem({...selectedItem, formatted: true});
+                }.bind(this));
             },
 
             /**
@@ -146,19 +199,41 @@
              */
             handelSearch() {
 
+                // check is user input valid value
                 if (!this.validateValue)
                     return this.items = [];
 
-                //https://www.mocky.io/
-                axios.get(this.uri)
-                    .then(({data}) => {
+                // show loader
+                this.loading = true;
+
+                // create request if needed
+                const buildRequest = () => {
+                    //https://www.mocky.io/
+                    const request = axios.get(this.uri);
+
+                    // done
+                    request.then(({data}) => {
                         this.items = data.filter(result => {
                             return result[this.keyMatch].search(this.getValue) >= 0;
                         });
-                    })
-                    .catch(error => {
-                        console.log('Error', error);
                     });
+
+                    // fail
+                    request.catch(error => {
+                        console.log('Request Error', error);
+                    });
+
+                    // always
+                    request.finally(() => {
+                        setTimeout(function () {
+                            this.loading = false;
+                        }.bind(this), 500);
+                        clearTimeout(this.requestTimeout);
+                    });
+                }
+
+                // set request timer
+                this.requestTimeout = setTimeout(buildRequest, this.requestDelay);
             },
 
             /**
@@ -167,6 +242,21 @@
              */
             handelOnOutSideClick(event) {
                 this.items = [];
+                this.tempTags = this.tags.splice(this.maxInputTags);
+            },
+
+            /**
+             * handel the event on user click on input
+             * @param event
+             */
+            handelOnInputClicked(event) {
+                event.preventDefault();
+
+                if (!this.isMore)
+                    return;
+
+                this.tags = this.tags.concat(this.tempTags);
+                this.tempTags = [];
             },
 
             /**
