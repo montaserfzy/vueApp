@@ -3,8 +3,7 @@ import Router from 'vue-router';
 
 import Home from './pages/Home.vue';
 import Login from './pages/Login.vue';
-import About from './pages/About.vue';
-import ContactUs from './pages/ContactUs.vue';
+import Username from './pages/Username.vue';
 import NotFound from './pages/NotFound.vue';
 
 Vue.use(Router);
@@ -14,8 +13,7 @@ const router = new Router({
     routes: [
         {path: '/', name: 'home', component: Home, meta: {isAuth: true}},
         {path: '/login', name: 'login', component: Login},
-        {path: '/contact_us', name: 'contact_us', component: ContactUs, meta: {isAuth: true}},
-        {path: '/about', name: 'about', component: About, meta: {isAuth: true}},
+        {path: '/username', name: 'username', component: Username, meta: {isAuth: true}},
         {path: '*', name: '404', component: NotFound, meta: {isAuth: true}}
     ]
 });

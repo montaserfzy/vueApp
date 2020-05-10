@@ -61,7 +61,6 @@
     import axios from '../providers/request';
     import PulseLoader from 'vue-spinner/src/PulseLoader.vue'
 
-
     export default {
         name: "AutoComplete",
 
@@ -100,12 +99,17 @@
                 }
             }
         },
+
         components: {
             'PulseLoader': PulseLoader
         },
+
         computed: {
             isListActive() {
-                return this.items.length !== 0 || this.isLoading;
+                return this.itemsLength !== 0 || this.isLoading;
+            },
+            itemsLength() {
+                return this.items.length;
             },
             validateValue() {
                 return this.value.trim().length !== 0;
@@ -123,25 +127,33 @@
                 return this.loading || false
             }
         },
+
         methods: {
 
             /**
              * handel input on user click enter
-             * @returns {*|void}
+             * @returns {*| void}
              */
             handelOnInputEnter() {
-                if (!this.validateValue)
-                    return;
 
+                // First: check if have active item in list
                 if (this._getActiveItemIndex() > -1) {
                     return this.handelSelectItem(this.items[this._getActiveItemIndex()]);
                 }
 
+                // Second: check if the input value valid
+                if (!this.validateValue)
+                    return false;
+
+                // Third: create new object with user input value
                 let object = new Object({
                     formatted: false
                 });
+
                 object[this.keyMatch] = this.getValue;
                 this.setTagItem(object);
+
+                // Reset the input value
                 this.value = '';
             },
 
@@ -195,7 +207,7 @@
 
             /**
              * handel search on user input value
-             * @returns {Array} of items
+             * @returns {Array|void} of items
              */
             handelSearch() {
 
@@ -230,7 +242,7 @@
                         }.bind(this), 500);
                         clearTimeout(this.requestTimeout);
                     });
-                }
+                };
 
                 // set request timer
                 this.requestTimeout = setTimeout(buildRequest, this.requestDelay);
@@ -279,11 +291,11 @@
             handelOnArrowDown(event) {
                 event.preventDefault();
 
-                if (!this.items.length)
+                if (!this.itemsLength)
                     return;
 
                 let itemIndex = this._getActiveItemIndex();
-                let nextItemIndex = itemIndex > this.items.length ? 0 : itemIndex + 1; // next item down
+                let nextItemIndex = itemIndex > this.itemsLength ? 0 : itemIndex + 1; // next item down
 
                 this._updateList(itemIndex, nextItemIndex);
             },
@@ -308,8 +320,8 @@
                 let currentItem = this.items[itemIndex];
                 let nextItem = this.items[nextItemIndex];
 
-                if (nextItemIndex === 0) {
-                    return this._updateItem(nextItem, {...nextItem, isActive: true});
+                if (nextItemIndex < 0) {
+                    return this._resetActiveItem();
                 }
 
                 this._updateItem(currentItem, {...currentItem, isActive: false});
@@ -321,18 +333,10 @@
              * remove active item from the list
              * @private
              */
-            _removeActiveItem() {
-                let activeItem = this.items.find((item, index) => {
-                    if (item.isActive === true) {
-                        return {
-                            ...item,
-                            index
-                        }
-                    }
-                });
-
-                if (activeItem)
-                    this.items.splice(activeItem.index, 1, {...activeItem, isActive: false});
+            _resetActiveItem() {
+                this._updateItem(this.items[1], {...this.items[1], isActive: false});
+                this._updateItem(this.items[0], {...this.items[0], isActive: true});
+                this._updateItemScrolling();
             },
 
             /**
@@ -389,6 +393,11 @@
             },
         },
         directives: {
+
+            /**
+             * directive to handel user click out of the auto complete box
+             * @directive
+             */
             'handle-click-outside': {
                 bind: function (el, binding) {
                     const {bubble} = binding.modifiers;
@@ -409,7 +418,3 @@
         }
     }
 </script>
-
-<style scoped>
-
-</style>

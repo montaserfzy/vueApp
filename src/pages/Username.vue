@@ -14,7 +14,11 @@
             <h3 id="HowToUse">
                 How To Use
             </h3>
-            <pre><code class="hljs html"><span class="hljs-comment">&lt;!-- How to us it in HTML --&gt;</span><br><br><span class="tag">&lt;AutoComplete uri='URI' keyMatch="MATCH_CASE" /&gt;</span></code></pre>
+
+            <pre>
+                <code class="hljs html"><span
+                        class="hljs-comment">&lt;!-- How to us it in HTML --&gt;</span><br><br><span class="tag">&lt;AutoComplete uri='URI' keyMatch="MATCH_CASE" /&gt;</span></code>
+            </pre>
         </section>
         <br>
         <br>
@@ -23,14 +27,14 @@
                 Example
             </h3>
             <blockquote>
-                AutoComplete field used to search by email
+                AutoComplete field used to search by username
             </blockquote>
             <br>
             <br>
             <AutoComplete
                     id="auto_complete"
-                    uri='http://www.mocky.io/v2/5eb6ff46310000fe3bc8a0e3'
-                    keyMatch="email"
+                    uri='http://www.mocky.io/v2/5eb814fe2d00008600357be1'
+                    keyMatch="username"
                     v-bind:maxInputTags=2
                     v-bind:requestDelay=1000
             />
@@ -46,7 +50,7 @@
 
             <pre>
                 <code class="hljs html"><span class="hljs-comment">&lt;!-- Used Props --&gt;</span><br><br><span
-                        class="tag">&lt;AutoComplete <br>   uri='http://www.mocky.io/v2/5eb6ff46310000fe3bc8a0e3'<br>   keyMatch='email'<br>   v-bind:maxInputTags=2<br>   v-bind:requestDelay=1000<br>/&gt;</span></code>
+                        class="tag">&lt;AutoComplete <br>   uri='http://www.mocky.io/v2/5eb814fe2d00008600357be1'<br>   keyMatch='username'<br>   v-bind:maxInputTags=2<br>   v-bind:requestDelay=1000<br>/&gt;</span></code>
             </pre>
         </section>
     </article>
@@ -61,11 +65,12 @@
             AutoComplete
         }
     })
-    export default class Home extends Vue {
-
+    export default class Username extends Vue {
     }
 </script>
 
-
 <style scoped>
+    h3 {
+        margin: 40px 0 0;
+    }
 </style>
