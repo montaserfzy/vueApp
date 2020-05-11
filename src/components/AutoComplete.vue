@@ -10,7 +10,7 @@
                          class="tag"
                          v-on:key="index"
                          v-on:click="handelUnSelectTag(tag)"
-                         v-on:variant="tag.formatted?'success':'danger'"
+                         v-bind:variant="tag.formatted?'light':'danger'"
                 >
                     {{tag[keyMatch]}}
                 </b-badge>
@@ -28,7 +28,7 @@
                        id="auto_complete_input"
 
                        v-model="value"
-                       v-on:placeholder="isTags?'':'Enter ' +[[ keyMatch ]]"
+                       v-bind:placeholder="isTags?'':'Enter ' +[[ keyMatch ]]"
                        v-on:click="handelOnInputClicked"
                        v-on:input="handelSearch"
                        v-on:keydown.8="handelOnBackSpace"
@@ -134,10 +134,9 @@
         },
 
         methods: {
-
             highlight(inputText) {
                 if(!this.validateValue || !inputText)
-                    return;
+                    return inputText;
 
                 let text = this.getValue;
                 let index = inputText.indexOf(text);
@@ -186,7 +185,7 @@
                 if (this.validateValue)
                     return;
 
-                this.tags.pop();
+                this.handelUnSelectTag(this.tags[this.tags.length -1]);
                 this._updateInput();
             },
 
@@ -286,11 +285,14 @@
             handelOnInputClicked(event) {
                 event.preventDefault();
 
+                this._removeActiveItem();
+
                 if (!this.isMore)
                     return;
 
                 this.tags = this.tags.concat(this.tempTags);
                 this.tempTags = [];
+
             },
 
             /**
@@ -372,6 +374,16 @@
                 this._updateItem(this.items[0], {...this.items[0], isActive: true});
                 this._updateItemScrolling();
             },
+
+            _removeActiveItem() {
+                const activeItemIndex = this._getActiveItemIndex();
+
+                if(activeItemIndex < 0)
+                    return;
+
+                this._updateItem(this.items[activeItemIndex], {...this.items[activeItemIndex], isActive: false});
+            },
+
 
             /**
              * update the item object values
