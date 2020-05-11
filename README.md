@@ -20,12 +20,12 @@ yarn build
 yarn lint
 ```
 
-###How to use
+### How to use
 ```
 <auto-complete uri='URI' keyMatch="Key" v-bind:maxInputTags=2 v-bind:requestDelay=500 />
 ```
 
-###Props
+### Props
 ```
 uri: `STRING`, `VALID_URL`, `REQUIRED`
 keyMatch: `STRING`, `REQUIRED`
@@ -33,20 +33,20 @@ maxInputTags: `NUMBER`, `OPTIONAL`, default:2
 requestDelay: `NUMBER`, `OPTIONAL`, default:100 ms
 ```
 
-###What is this project contain
+### What is this project contain
 
-####Pages: 
+#### Pages: 
 - `Login`
 - `Email` 
 - `Username` 
 - `About` 
 - `404` 
 
-####Components
+#### Components
 - `AutoComplete` 
 - `NavBar` 
 
-####Features
+#### Features
 - While user type into the field. showing list for the suggestions result
 - Have dynamic get url
 - Have dynamic response delay timeout
@@ -62,7 +62,7 @@ requestDelay: `NUMBER`, `OPTIONAL`, default:100 ms
 - Arrow up and down change the background color to `#eeeeee`
 - Selected item in drop down list have left border `2px solid #42b983`
 
-####TODO
+#### TODO
 - Make the widget more dynamic by adding more props for coloring, spinner DOM, keys, ...etc.
 - Adding validation on input value.
 - Adding animation to drop down list and select un select item
