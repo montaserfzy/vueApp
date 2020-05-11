@@ -142,9 +142,11 @@
                 let text = this.getValue;
                 let index = inputText.indexOf(text);
                 if (index >= 0) {
-                    let inputTextSS = inputText.substring(0, index) + "<span class='highlight'>" + inputText.substring(index, index + text.length) + "</span>" + inputText.substring(index + text.length);
-                    inputText = inputTextSS;
-
+                    inputText = inputText.substring(0, index)
+                        + "<span class='highlight'>"
+                        + inputText.substring(index, index + text.length)
+                        + "</span>"
+                        + inputText.substring(index + text.length);
                 }
                 return inputText;
             },
