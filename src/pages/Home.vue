@@ -52,15 +52,16 @@
     </article>
 </template>
 
-<script lang="ts">
+<script>
     import {Component, Vue} from 'vue-property-decorator';
     import AutoComplete from '../components/AutoComplete';
 
     @Component({
         components: {
-            'auto-complete':AutoComplete
+            'auto-complete': AutoComplete,
         }
     })
+
     export default class Home extends Vue {
 
     }

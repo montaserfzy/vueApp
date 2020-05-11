@@ -9,7 +9,7 @@
   </div>
 </template>
 
-<script lang="ts">
+<script>
 import * as VueJs from 'vue-property-decorator';
 
 @VueJs.Component

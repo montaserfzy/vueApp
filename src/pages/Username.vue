@@ -56,7 +56,7 @@
     </article>
 </template>
 
-<script lang="ts">
+<script>
     import {Component, Vue} from 'vue-property-decorator';
     import AutoComplete from '../components/AutoComplete';
 

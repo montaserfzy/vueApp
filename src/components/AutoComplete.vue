@@ -6,38 +6,35 @@
              v-on:click="_updateInput"
         >
             <div class="auto-complete-input">
-                <b-badge :variant="tag.formatted?'success':'danger'"
-                         v-for="tag in tags"
+                <b-badge v-for="( tag, index ) in tags"
                          class="tag"
+                         v-on:key="index"
                          v-on:click="handelUnSelectTag(tag)"
+                         v-on:variant="tag.formatted?'success':'danger'"
                 >
                     {{tag[keyMatch]}}
                 </b-badge>
                 <b-badge variant="light"
                          class="more"
                          v-if="isMore"
-                         for="auto_complete_input"
                          v-on:click="handelOnInputClicked"
                 >
                     more {{getTotalMoreItems}}
                 </b-badge>
 
-                <input autofocus="true"
+                <input autofocus
                        type="text"
                        ref="inputRef"
                        id="auto_complete_input"
 
-                       :placeholder="isTags?'':'Enter ' +[[ keyMatch ]]"
-
                        v-model="value"
+                       v-on:placeholder="isTags?'':'Enter ' +[[ keyMatch ]]"
                        v-on:click="handelOnInputClicked"
-
+                       v-on:input="handelSearch"
+                       v-on:keydown.8="handelOnBackSpace"
+                       v-on:keydown.13="handelOnInputEnter"
                        v-on:keydown.38="handelOnArrowUp"
                        v-on:keydown.40="handelOnArrowDown"
-
-                       v-on:input="handelSearch"
-                       v-on:keydown.13="handelOnInputEnter"
-                       v-on:keydown.8="handelOnBackSpace"
                 />
             </div>
             <div class="auto-complete-dropdown">
@@ -51,8 +48,8 @@
                     id="auto_complete_list"
                     v-bind:class="{'active': !isLoading}"
                 >
-                    <li v-for="item in items"
-                        :key="item[keyMatch]"
+                    <li v-for="( item, index )  in items"
+                        v-on:key="index"
                         v-on:click="toggleSelectedItem(item)"
                         v-bind:class="{'selected':item.isSelected, 'active':item.isActive}"
                     >

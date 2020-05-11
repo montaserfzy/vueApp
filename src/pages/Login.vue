@@ -9,8 +9,8 @@
                     <div class="card-body">
                         <form action="" autocomplete="off" id="form">
                             <div class="form-group">
-                                <label for="email">Email</label>
-                                <input id="email" type="email" v-model="email" required autofocus class="form-control" v-bind:class="{ 'border-danger': !isEmailValid }">
+                                <label for="username">Username</label>
+                                <input id="username" type="text" v-model="username" required autofocus class="form-control" v-bind:class="{ 'border-danger': !isUserNameValid }">
                             </div>
                             <div class="form-group">
                                 <label for="password">Password</label>
@@ -27,35 +27,36 @@
     </div>
 </template>
 
-<script lang="ts">
-    import router from "../routes";
-
+<script>
     export default {
         name: "Login",
 
         data() {
             return {
-                email: "",
-                password: "",
+                username: '',
+                password: '',
                 pattern: {
-                    email: /\S+@\S+\.\S+/,
+                    username: /\S+@\S+\.\S+/,
                 },
             }
         },
 
         computed:{
-            isEmailValid(){
-                return this.email.match(this.pattern.email) || this.email.trim()=== '';
+            isUserNameValid(){
+                // return this.username.match(this.pattern.username) || this.username.trim()=== '';
+                return this.username.trim() === '';
             },
             isPasswordValid(){
-                return this.password.trim().length > 6 || this.password.trim()=== '';
+                // return this.password.trim().length > 6 || this.password.trim()=== '';
+                return this.password.trim() === '';
             }
         },
 
         methods: {
             validateForm() {
-                return this.isEmailValid && this.isPasswordValid;
+                return this.isUserNameValid && this.isPasswordValid;
             },
+
             handleSubmit(e) {
                 e.preventDefault();
 
@@ -63,7 +64,7 @@
                     return;
                 }
 
-                localStorage.setItem('user', JSON.stringify({email:this.email}));
+                localStorage.setItem('user', JSON.stringify({username:this.username}));
                 //return router.replace('/');
                 return window.location.href = '/';
             }
