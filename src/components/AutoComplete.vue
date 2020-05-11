@@ -258,14 +258,11 @@
 
                         data.forEach(async result => {
                             let search = result[this.keyMatch].search(this.getValue) >= 0;
+
                             if(!search)
                                 return false;
 
-
                             let isSelected = await _self.getTagItem(result) >= 0;
-                            window.tags = this.tags;
-                            window.item = result;
-                            console.log('item >>>', result, isSelected);
 
                             let item = {
                                 ...result,
