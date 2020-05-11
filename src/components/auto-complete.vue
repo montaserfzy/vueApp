@@ -8,21 +8,25 @@
             <div class="auto-complete-input">
                 <label v-for="tag in tags"
                        class="tag"
-                       v-on:click="handelUnSelectItem(tag)"
+                       v-on:click="handelUnSelectTag(tag)"
                        v-bind:class="{'danger': !tag.formatted}"
                 >
                     {{tag[keyMatch]}}
                 </label>
                 <label class="more"
-                       v-if="isMore">
+                       v-if="isMore"
+                       for="auto_complete_input"
+                       v-on:click="handelOnInputClicked"
+                >
                     more {{getTotalMoreItems}}
                 </label>
 
                 <input autofocus="true"
                        type="text"
                        ref="inputRef"
+                       id="auto_complete_input"
 
-                       :placeholder="'Enter ' +[[ keyMatch ]]"
+                       :placeholder="isTags?'':'Enter ' +[[ keyMatch ]]"
 
                        v-model="value"
                        v-on:click="handelOnInputClicked"
@@ -39,17 +43,18 @@
                 <PulseLoader
                         color="#e1567c"
                         :loading="isLoading"
-                        v-bind:style="spinnerStyle"></PulseLoader>
+                        v-bind:style="spinnerStyle">
+                </PulseLoader>
                 <ul ref="scrollContainer"
                     id="auto_complete_list"
                     v-bind:class="{'active': !isLoading}"
                 >
                     <li v-for="item in items"
                         :key="item[keyMatch]"
-                        v-on:click="handelSelectItem(item)"
+                        v-on:click="toggleSelectedItem(item)"
                         v-bind:class="{'selected':item.isSelected, 'active':item.isActive}"
                     >
-                        <p>{{ item[keyMatch] }}</p>
+                        <p v-html="highlight(item[keyMatch])"></p>
                     </li>
                 </ul>
             </div>
@@ -115,20 +120,34 @@
                 return this.value.trim().length !== 0;
             },
             getValue() {
-                return this.value.trim()
+                return this.value.toLocaleLowerCase().trim();
             },
             getTotalMoreItems() {
-                return this.tempTags.length
+                return this.tempTags.length;
             },
             isMore() {
                 return this.tempTags.length !== 0;
             },
             isLoading() {
-                return this.loading || false
+                return this.loading || false;
+            },
+            isTags() {
+                return this.tags.length !== 0;
             }
         },
 
         methods: {
+
+            highlight(inputText) {
+                let text = this.getValue;
+                let index = inputText.indexOf(text);
+                if (index >= 0) {
+                    let inputTextSS = inputText.substring(0, index) + "<span class='highlight'>" + inputText.substring(index, index + text.length) + "</span>" + inputText.substring(index + text.length);
+                    inputText = inputTextSS;
+
+                }
+                return inputText;
+            },
 
             /**
              * handel input on user click enter
@@ -138,7 +157,7 @@
 
                 // First: check if have active item in list
                 if (this._getActiveItemIndex() > -1) {
-                    return this.handelSelectItem(this.items[this._getActiveItemIndex()]);
+                    return this.toggleSelectedItem(this.items[this._getActiveItemIndex()]);
                 }
 
                 // Second: check if the input value valid
@@ -170,10 +189,10 @@
             },
 
             /**
-             * handel un select item
-             * @param unSelectedItem
+             * handel un select tagged item
+             * @param unSelectedTagItem
              */
-            handelUnSelectItem(unSelectedItem) {
+            handelUnSelectTag(unSelectedItem) {
                 const keyMatch = this.keyMatch;
                 const keyMatchValue = unSelectedItem[keyMatch];
 
@@ -184,25 +203,26 @@
                     return item;
                 });
 
-                this.tags = this.tags.filter(tag => tag[keyMatch] !== keyMatchValue);
+                this.unSetTagItem(unSelectedItem);
                 this._updateInput();
             },
 
             /**
-             * handel select new item
+             * function to toggle item selected
              * @param selectedItem
              */
-            handelSelectItem(selectedItem) {
-                const keyMatch = this.keyMatch;
-                const keyMatchValue = selectedItem[keyMatch];
+            toggleSelectedItem(selectedItem) {
+                selectedItem.isSelected ? this.unSetTagItem(selectedItem) : this.setTagItem({
+                    ...selectedItem,
+                    formatted: true
+                });
 
-                this.items = this.items.map(function (item) {
-                    if (item[keyMatch] === keyMatchValue && !item.isSelected) {
-                        item.isSelected = true;
-                        this.setTagItem({...selectedItem, formatted: true});
-                    }
-                    return item;
-                }.bind(this));
+                this.items.splice(this._getItemIndex(selectedItem), 1, {
+                    ...selectedItem,
+                    isSelected: !selectedItem.isSelected
+                });
+
+                this._updateInput();
             },
 
             /**
@@ -309,6 +329,12 @@
                 this._updateInput();
             },
 
+            unSetTagItem(selectedTag) {
+                let index = this.tags.findIndex(tag => tag[this.keyMatch] === selectedTag[this.keyMatch]);
+                this.tags.splice(index, 1);
+                this._updateInput();
+            },
+
             /**
              * handel updating list items active or not active by item index in array
              * @param itemIndex
@@ -407,7 +433,7 @@
                         }
                     };
                     el.__vueHandleClickOutside__ = clickHandler;
-                    document.addEventListener('click', clickHandler)
+                    document.addEventListener('click', clickHandler, true)
                 },
 
                 unbind: function (el) {
