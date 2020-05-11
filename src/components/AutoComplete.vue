@@ -104,8 +104,6 @@
             }
         },
 
-        components: {},
-
         computed: {
             isListActive() {
                 return this.itemsLength !== 0 || this.isLoading;
@@ -134,6 +132,11 @@
         },
 
         methods: {
+
+            /**
+             * handel text highlighted
+             * @returns {string}
+             */
             highlight(inputText) {
                 if(!this.validateValue || !inputText)
                     return inputText;
@@ -339,6 +342,10 @@
                 this._updateInput();
             },
 
+            /**
+             * handel unset tag remove item from the tas list and items list
+             * @param selectedTag
+             */
             unSetTagItem(selectedTag) {
                 let index = this.tags.findIndex(tag => tag[this.keyMatch] === selectedTag[this.keyMatch]);
                 this.tags.splice(index, 1);
@@ -366,7 +373,7 @@
             },
 
             /**
-             * remove active item from the list
+             * reset active item from the list to first item in list
              * @private
              */
             _resetActiveItem() {
@@ -375,6 +382,10 @@
                 this._updateItemScrolling();
             },
 
+            /**
+             * remove active item from the list
+             * @private
+             */
             _removeActiveItem() {
                 const activeItemIndex = this._getActiveItemIndex();
 

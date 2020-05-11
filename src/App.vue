@@ -1,15 +1,15 @@
 <template>
     <div class="main">
-        <nav-bar></nav-bar>
+        <nav-bar />
         <div class="container pt-4">
-            <router-view></router-view>
+            <router-view />
         </div>
     </div>
 </template>
 
 <script>
     import { Component, Vue } from 'vue-property-decorator'
-    import NavBar from './components/navbar'
+    import NavBar from './components/NavBar'
     @Component({
         components: {
             'nav-bar': NavBar

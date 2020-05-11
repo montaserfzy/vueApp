@@ -14,7 +14,7 @@ html, body {
     margin: 2px 4px 2px 0px;
     display: inline-block;
     cursor: pointer;
-    box-shadow: 2px 2px 2px #cccccc4a;
+    box-shadow: 2px 2px 2px #cccccc59;
     line-height: 1.2rem;
     height: 1.9rem;
     padding: 5px 10px;
@@ -31,9 +31,11 @@ html, body {
     cursor: pointer;
     font-size: 11px;
     padding: 5px 10px;
-    line-height: 1.2rem;
+    line-height: 1.1rem;
     color: var(--gray);
-    box-shadow: 2px 2px 2px #cccccc4a;
+    height: 1.9rem;
+    box-shadow: 2px 2px 2px #cccccc9c;
+    border-radius: 1rem;
   }
   .auto-complete-input {
     padding: 5px;
@@ -79,9 +81,11 @@ html, body {
       line-height: 1rem;
       font-size: 0.8rem;
       border-left: 3px solid #0000;
-      &.active,
-      &:hover {
+      &.active{
         background: $light-gray;
+      }
+      &:hover {
+        background: $light-blue;
       }
     }
     li:last-child {

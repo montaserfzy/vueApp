@@ -5,6 +5,7 @@ import Home from './pages/Home.vue';
 import Login from './pages/Login.vue';
 import Username from './pages/Username.vue';
 import NotFound from './pages/NotFound.vue';
+import About from './pages/About.vue';
 
 Vue.use(Router);
 
@@ -14,6 +15,7 @@ const router = new Router({
         {path: '/', name: 'home', component: Home, meta: {isAuth: true}},
         {path: '/login', name: 'login', component: Login},
         {path: '/username', name: 'username', component: Username, meta: {isAuth: true}},
+        {path: '/about', name: 'about', component: About, meta: {isAuth: true}},
         {path: '*', name: '404', component: NotFound, meta: {isAuth: true}}
     ]
 });
