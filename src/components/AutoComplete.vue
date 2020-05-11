@@ -48,10 +48,10 @@
                     id="auto_complete_list"
                     v-bind:class="{'active': !isLoading}"
                 >
-                    <li v-for="( item, index )  in items"
+                    <li v-for="( item, index ) in getItems"
                         v-on:key="index"
                         v-on:click="toggleSelectedItem(item)"
-                        v-bind:class="{'selected':item.isSelected, 'active':item.isActive}"
+                        v-bind:class="{'selected': item.isSelected, 'active':item.isActive}"
                     >
                         <p v-html="highlight(item[keyMatch])"></p>
                     </li>
@@ -128,6 +128,9 @@
             },
             isTags() {
                 return this.tags.length !== 0;
+            },
+            getItems(){
+                return this.items;
             }
         },
 
@@ -204,6 +207,7 @@
                     if (item[keyMatch] === keyMatchValue) {
                         item.isSelected = false;
                     }
+                    console.log('handelUnSelectTag');
                     return item;
                 });
 
@@ -248,9 +252,27 @@
                     const request = axios.get(this.uri);
 
                     // done
+                    const _self = this;
                     request.then(({data}) => {
-                        this.items = data.filter(result => {
-                            return result[this.keyMatch].search(this.getValue) >= 0;
+                        this.items= [];
+
+                        data.forEach(async result => {
+                            let search = result[this.keyMatch].search(this.getValue) >= 0;
+                            if(!search)
+                                return false;
+
+
+                            let isSelected = await _self.getTagItem(result) >= 0;
+                            window.tags = this.tags;
+                            window.item = result;
+                            console.log('item >>>', result, isSelected);
+
+                            let item = {
+                                ...result,
+                                isSelected
+                            };
+
+                            this.items.push(item);
                         });
                     });
 
@@ -347,9 +369,18 @@
              * @param selectedTag
              */
             unSetTagItem(selectedTag) {
-                let index = this.tags.findIndex(tag => tag[this.keyMatch] === selectedTag[this.keyMatch]);
+                let index = this.getTagItem(selectedTag);
                 this.tags.splice(index, 1);
                 this._updateInput();
+            },
+
+            /**
+             * function to get item index from tag array
+             * @param item
+             * @returns {1,0,-1}
+             */
+            getTagItem(item){
+                return this.tags.findIndex(tag=>tag[this.keyMatch] ===item[this.keyMatch])
             },
 
             /**
@@ -394,7 +425,6 @@
 
                 this._updateItem(this.items[activeItemIndex], {...this.items[activeItemIndex], isActive: false});
             },
-
 
             /**
              * update the item object values
