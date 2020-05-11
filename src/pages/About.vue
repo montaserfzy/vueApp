@@ -79,6 +79,7 @@
                     <li class="list-group-item">Adding description on user input value if the value is already selected.</li>
                     <li class="list-group-item">Showing button to save selection values and retrieve it any time.</li>
                     <li class="list-group-item">Build it as a package to be able to used any where.</li>
+                    <li class="list-group-item">Adding avatar image and item description dom on demand</li>
                 </ul>
             </div>
 

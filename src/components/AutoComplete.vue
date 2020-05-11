@@ -53,6 +53,7 @@
                     <li v-for="( item, index ) in getItems"
                         v-on:key="index"
                         v-on:click="toggleSelectedItem(item)"
+                        @mouseover="setMouseOver(item)"
                         v-bind:class="{'selected': item.isSelected, 'active':item.isActive}"
                     >
                         <p v-html="highlight(item[keyMatch])"></p>
@@ -137,6 +138,15 @@
         },
 
         methods: {
+
+            setMouseOver(nextItem){
+
+                this.items = this.items.map(item => {
+                    if(item[this.keyMatch] === nextItem[this.keyMatch])
+                        return {...item, isActive:true};
+                    return {...item, isActive:false};
+                });
+            },
 
             /**
              * handel text highlighted
