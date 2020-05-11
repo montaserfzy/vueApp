@@ -6,20 +6,21 @@
              v-on:click="_updateInput"
         >
             <div class="auto-complete-input">
-                <label v-for="tag in tags"
-                       class="tag"
-                       v-on:click="handelUnSelectTag(tag)"
-                       v-bind:class="{'danger': !tag.formatted}"
+                <b-badge :variant="tag.formatted?'success':'danger'"
+                         v-for="tag in tags"
+                         class="tag"
+                         v-on:click="handelUnSelectTag(tag)"
                 >
                     {{tag[keyMatch]}}
-                </label>
-                <label class="more"
-                       v-if="isMore"
-                       for="auto_complete_input"
-                       v-on:click="handelOnInputClicked"
+                </b-badge>
+                <b-badge variant="light"
+                         class="more"
+                         v-if="isMore"
+                         for="auto_complete_input"
+                         v-on:click="handelOnInputClicked"
                 >
                     more {{getTotalMoreItems}}
-                </label>
+                </b-badge>
 
                 <input autofocus="true"
                        type="text"
@@ -40,11 +41,12 @@
                 />
             </div>
             <div class="auto-complete-dropdown">
-                <PulseLoader
-                        color="#e1567c"
-                        :loading="isLoading"
-                        v-bind:style="spinnerStyle">
-                </PulseLoader>
+                <b-spinner
+                        v-bind:style="spinnerStyle"
+                        v-if="isLoading"
+                        label="Spinning">
+
+                </b-spinner>
                 <ul ref="scrollContainer"
                     id="auto_complete_list"
                     v-bind:class="{'active': !isLoading}"
@@ -64,7 +66,6 @@
 
 <script>
     import axios from '../providers/request';
-    import PulseLoader from 'vue-spinner/src/PulseLoader.vue'
 
     export default {
         name: "AutoComplete",
@@ -101,13 +102,12 @@
                     height: 20,
                     width: 40,
                     margin: '30px auto',
+                    color: '#42b983'
                 }
             }
         },
 
-        components: {
-            'PulseLoader': PulseLoader
-        },
+        components: {},
 
         computed: {
             isListActive() {
@@ -139,6 +139,9 @@
         methods: {
 
             highlight(inputText) {
+                if(!this.validateValue || !inputText)
+                    return;
+
                 let text = this.getValue;
                 let index = inputText.indexOf(text);
                 if (index >= 0) {
@@ -303,6 +306,9 @@
                 let itemIndex = this._getActiveItemIndex();
                 let nextItemIndex = itemIndex < 0 ? 0 : itemIndex - 1; // next item up
 
+                if(nextItemIndex < 0)
+                    return ;
+
                 this._updateList(itemIndex, nextItemIndex);
             },
 
@@ -318,6 +324,9 @@
 
                 let itemIndex = this._getActiveItemIndex();
                 let nextItemIndex = itemIndex > this.itemsLength ? 0 : itemIndex + 1; // next item down
+
+                if(nextItemIndex >= this.itemsLength)
+                    return ;
 
                 this._updateList(itemIndex, nextItemIndex);
             },

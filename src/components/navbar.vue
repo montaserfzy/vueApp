@@ -17,13 +17,13 @@
 <script>
     export default {
         name: "NavBar",
-        data() {
-            const isLoggedIn = !!window.localStorage?.user;
 
-            return {
-                isLoggedIn
+        computed:{
+            isLoggedIn(){
+                return !!window.localStorage.user;
             }
         },
+
         methods: {
             onLogOut(e) {
                 e.preventDefault();

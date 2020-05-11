@@ -1,6 +1,6 @@
 <template>
     <div class="main">
-        <NavBar></NavBar>
+        <nav-bar></nav-bar>
         <div class="container pt-4">
             <router-view></router-view>
         </div>
@@ -12,7 +12,7 @@
     import NavBar from './components/navbar'
     @Component({
         components: {
-            NavBar
+            'nav-bar': NavBar
         }
     })
     export default class App extends Vue {}

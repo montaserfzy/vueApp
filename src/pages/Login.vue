@@ -28,7 +28,11 @@
 </template>
 
 <script lang="ts">
+    import router from "../routes";
+
     export default {
+        name: "Login",
+
         data() {
             return {
                 email: "",
@@ -38,6 +42,7 @@
                 },
             }
         },
+
         computed:{
             isEmailValid(){
                 return this.email.match(this.pattern.email) || this.email.trim()=== '';
@@ -46,6 +51,7 @@
                 return this.password.trim().length > 6 || this.password.trim()=== '';
             }
         },
+
         methods: {
             validateForm() {
                 return this.isEmailValid && this.isPasswordValid;
@@ -58,18 +64,9 @@
                 }
 
                 localStorage.setItem('user', JSON.stringify({email:this.email}));
+                //return router.replace('/');
                 return window.location.href = '/';
             }
         }
     };
 </script>
-
-<style scoped>
-    h3 {
-        margin: 40px 0 0;
-    }
-
-    p {
-       margin: 0;
-    }
-</style>

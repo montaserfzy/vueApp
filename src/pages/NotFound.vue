@@ -1,9 +1,11 @@
 <template>
-  <div class="login">
-    <h1>404</h1>
-    <p>
-      Page Not Found! <a href="/">Back To Home</a>
-    </p>
+  <div class="d-flex flex-sm-grow-1 min-vh-90 justify-content-center align-items-center">
+    <div class="d-flex flex-column align-items-center h-auto">
+      <h1 class="py-3 text-muted font-weight-bolder fs-100">404</h1>
+      <p class="p-0">
+        Page Not Found! <a href="/" class="text-success">Back To Home</a>
+      </p>
+    </div>
   </div>
 </template>
 
@@ -14,15 +16,3 @@ import * as VueJs from 'vue-property-decorator';
 export default class NotFound extends VueJs.Vue {
 }
 </script>
-
-<style scoped>
-h1 {
-  margin: 40px 0 0;
-}
-p{
-  margin:0px;
-}
-a {
-  color: #42b983;
-}
-</style>

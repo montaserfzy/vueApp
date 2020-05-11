@@ -16,7 +16,7 @@
       </h3>
 
       <pre>
-                <code class="hljs html"><span class="hljs-comment">&lt;!-- How to us it in HTML --&gt;</span><br><br><span class="tag">&lt;AutoComplete uri='URI' keyMatch="MATCH_CASE" /&gt;</span></code>
+                <code class="hljs html"><span class="hljs-comment">&lt;!-- How to us it in HTML --&gt;</span><br><br><span class="tag">&lt;auto-complete uri='URI' keyMatch="MATCH_CASE" /&gt;</span></code>
             </pre>
     </section>
     <br>
@@ -31,7 +31,7 @@
       </blockquote>
       <br>
       <br>
-      <AutoComplete
+      <auto-complete
               id="auto_complete"
               uri='http://www.mocky.io/v2/5eb81caf2d00003e2b357c02'
               keyMatch="language"
@@ -47,25 +47,19 @@
       <h3 id="Props">
         Props
       </h3>
-      <pre><code class="hljs html"><span class="hljs-comment">&lt;!-- Used Props --&gt;</span><br><br><span class="tag">&lt;AutoComplete <br>   uri='http://www.mocky.io/v2/5eb81caf2d00003e2b357c02'<br>   keyMatch='language'<br>   v-bind:maxInputTags=2<br>   v-bind:requestDelay=1000<br>/&gt;</span></code></pre>
+      <pre><code class="hljs html"><span class="hljs-comment">&lt;!-- Used Props --&gt;</span><br><br><span class="tag">&lt;auto-complete <br>   uri='http://www.mocky.io/v2/5eb81caf2d00003e2b357c02'<br>   keyMatch='language'<br>   v-bind:maxInputTags=2<br>   v-bind:requestDelay=1000<br>/&gt;</span></code></pre>
     </section>
   </article>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import AutoComplete from '../components/auto-complete';
+import AutoComplete from '../components/AutoComplete';
 
 @Component({
     components: {
-        AutoComplete
+        'auto-complete':AutoComplete
     }
 })
 export default class ContactUs extends Vue {}
 </script>
-
-<style scoped>
-h3 {
-  margin: 40px 0 0;
-}
-</style>
