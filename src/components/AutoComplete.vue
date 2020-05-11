@@ -5,7 +5,9 @@
              v-handle-click-outside="handelOnOutSideClick"
              v-on:click="_updateInput"
         >
-            <div class="auto-complete-input">
+            <div class="auto-complete-input"
+                 v-on:click="handelOnInputClicked"
+            >
                 <b-badge v-for="( tag, index ) in tags"
                          class="tag"
                          v-on:key="index"
@@ -129,7 +131,7 @@
             isTags() {
                 return this.tags.length !== 0;
             },
-            getItems(){
+            getItems() {
                 return this.items;
             }
         },
@@ -141,7 +143,7 @@
              * @returns {string}
              */
             highlight(inputText) {
-                if(!this.validateValue || !inputText)
+                if (!this.validateValue || !inputText)
                     return inputText;
 
                 let text = this.getValue;
@@ -191,7 +193,7 @@
                 if (this.validateValue)
                     return;
 
-                this.handelUnSelectTag(this.tags[this.tags.length -1]);
+                this.handelUnSelectTag(this.tags[this.tags.length - 1]);
                 this._updateInput();
             },
 
@@ -254,12 +256,12 @@
                     // done
                     const _self = this;
                     request.then(({data}) => {
-                        this.items= [];
+                        this.items = [];
 
                         data.forEach(async result => {
                             let search = result[this.keyMatch].search(this.getValue) >= 0;
 
-                            if(!search)
+                            if (!search)
                                 return false;
 
                             let isSelected = await _self.getTagItem(result) >= 0;
@@ -297,7 +299,8 @@
              */
             handelOnOutSideClick(event) {
                 this.items = [];
-                this.tempTags = this.tags.splice(this.maxInputTags);
+                if (!this.isMore)
+                    this.tempTags = this.tags.splice(this.maxInputTags);
             },
 
             /**
@@ -327,8 +330,8 @@
                 let itemIndex = this._getActiveItemIndex();
                 let nextItemIndex = itemIndex < 0 ? 0 : itemIndex - 1; // next item up
 
-                if(nextItemIndex < 0)
-                    return ;
+                if (nextItemIndex < 0)
+                    return;
 
                 this._updateList(itemIndex, nextItemIndex);
             },
@@ -346,8 +349,8 @@
                 let itemIndex = this._getActiveItemIndex();
                 let nextItemIndex = itemIndex > this.itemsLength ? 0 : itemIndex + 1; // next item down
 
-                if(nextItemIndex >= this.itemsLength)
-                    return ;
+                if (nextItemIndex >= this.itemsLength)
+                    return;
 
                 this._updateList(itemIndex, nextItemIndex);
             },
@@ -376,8 +379,8 @@
              * @param item
              * @returns {1,0,-1}
              */
-            getTagItem(item){
-                return this.tags.findIndex(tag=>tag[this.keyMatch] ===item[this.keyMatch])
+            getTagItem(item) {
+                return this.tags.findIndex(tag => tag[this.keyMatch] === item[this.keyMatch])
             },
 
             /**
@@ -417,7 +420,7 @@
             _removeActiveItem() {
                 const activeItemIndex = this._getActiveItemIndex();
 
-                if(activeItemIndex < 0)
+                if (activeItemIndex < 0)
                     return;
 
                 this._updateItem(this.items[activeItemIndex], {...this.items[activeItemIndex], isActive: false});
