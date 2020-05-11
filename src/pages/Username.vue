@@ -24,7 +24,7 @@
                     uri='http://www.mocky.io/v2/5eb814fe2d00008600357be1'
                     keyMatch="username"
                     v-bind:maxInputTags=2
-                    v-bind:requestDelay=10
+                    v-bind:requestDelay=500
             />
         </section>
         <br>
